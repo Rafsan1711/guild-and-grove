@@ -13,10 +13,10 @@ func _ready():
 func _on_google_login_pressed():
 	google_btn.disabled = true
 	status_label.text = "Opening Google login..."
-	Firebase.Auth.get_google_auth_localhost(8060)
+	Firebase.Auth.get_google_auth_localhost(49152)
 
 func _on_login_success(auth_info: Dictionary):
-	status_label.text = "Logged in! Loading..."
+	status_label.text = "✅ Logged in successfully!"
 	
 	GameState.player_uid = auth_info.get("localid", "")
 	GameState.player_email = auth_info.get("email", "")
@@ -24,10 +24,13 @@ func _on_login_success(auth_info: Dictionary):
 	GameState.player_photo_url = auth_info.get("photouri", "")
 	GameState.is_logged_in = true
 	
-	print("✅ Login success: ", GameState.player_display_name)
+	print("✅ Login success!")
+	print("   UID: ", GameState.player_uid)
+	print("   Email: ", GameState.player_email)
+	print("   Name: ", GameState.player_display_name)
 	
-	await get_tree().create_timer(1.0).timeout
-	get_tree().change_scene_to_file("res://scenes/world/MainWorld.tscn")
+	# MainWorld scene এখনো নেই — ROADMAP-2 এ বানানোর পর uncomment করবে:
+	# get_tree().change_scene_to_file("res://scenes/world/MainWorld.tscn")
 
 func _on_login_failed(code, message):
 	google_btn.disabled = false

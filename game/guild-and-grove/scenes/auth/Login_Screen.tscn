@@ -5,10 +5,10 @@
 [node name="LoginScreen" type="Control" unique_id=499728126]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 381.0
-offset_top = 168.0
-offset_right = 421.0
-offset_bottom = 208.0
+offset_left = 434.0
+offset_top = 188.0
+offset_right = 474.0
+offset_bottom = 228.0
 script = ExtResource("1_ac1fg")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=987282763]
