@@ -1,0 +1,41 @@
+name: Deploy Server to HuggingFace
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'server/**'       # শুধু server code change হলেই deploy হবে
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push server to HuggingFace
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd server
+          
+          # Git configure
+          git config --global user.email "deploy@guild-grove.com"
+          git config --global user.name "GitHub Actions"
+          
+          # HuggingFace remote যোগ করো
+          git init
+          git remote add hf https://user:${HF_TOKEN}@huggingface.co/spaces/${{ secrets.HF_USERNAME }}/guild-and-grove-server
+          
+          # Force push করো
+          git add -A
+          git commit -m "Deploy from GitHub: ${{ github.sha }}"
+          git push hf main --force
+          
+      - name: Deployment Success
+        run: echo "✅ Server deployed to HuggingFace!"

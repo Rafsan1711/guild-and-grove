@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://cdp1ffd3dlah1"]
+
+[ext_resource type="Script" uid="uid://27mgbhgvtkoc" path="res://scripts/auth/login_screen.gd" id="1_ac1fg"]
+
+[node name="LoginScreen" type="Control" unique_id=499728126]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 381.0
+offset_top = 168.0
+offset_right = 421.0
+offset_bottom = 208.0
+script = ExtResource("1_ac1fg")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=987282763]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.101960786, 0.18039216, 0.101960786, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2060047428]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -31.0
+offset_right = 20.0
+offset_bottom = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=265290133]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Guild & Grove"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="VBoxContainer" unique_id=929514315]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "An Online Village Adventure"
+
+[node name="GoogleBtn" type="Button" parent="VBoxContainer" unique_id=43593192]
+custom_minimum_size = Vector2(300, 60)
+layout_mode = 2
+text = "🌐  Sign in with Google"
+
+[node name="StatusLabel" type="Label" parent="." unique_id=1565825042]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0

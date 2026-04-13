@@ -5,9 +5,6 @@ extends HTTPRequest
 
 const _API_VERSION := "v1"
 
-# Emitted for each Auth request issued.
-# `result_code` -> Either `1` if auth succeeded or `error_code` if unsuccessful auth request
-# `result_content` -> Either `auth_result` if auth succeeded or `error_message` if unsuccessful auth request
 signal auth_request(result_code, result_content)
 
 signal signup_succeeded(auth_result)
@@ -179,13 +176,10 @@ func _is_ready() -> bool:
 		return true
 
 
-# Synchronous call to check if any user is already logged in.
 func is_logged_in() -> bool:
 	return auth != null and auth.has("idtoken")
 
 
-# Called with Firebase.Auth.signup_with_email_and_password(email, password)
-# You must pass in the email and password to this function for it to work correctly
 func signup_with_email_and_password(email : String, password : String) -> void:
 	if _is_ready():
 		is_busy = true
@@ -195,10 +189,6 @@ func signup_with_email_and_password(email : String, password : String) -> void:
 		request(_base_url + _signup_request_url, _headers, HTTPClient.METHOD_POST, JSON.stringify(_login_request_body))
 
 
-# Called with Firebase.Auth.anonymous_login()
-# A successful request is indicated by a 200 OK HTTP status code. 
-# The response contains the Firebase ID token and refresh token associated with the anonymous user.
-# The 'mail' field will be empty since no email is linked to an anonymous user
 func login_anonymous() -> void:
 	if _is_ready():
 		is_busy = true
@@ -215,7 +205,6 @@ func login_with_email_and_password(email : String, password : String) -> void:
 		request(_base_url + _signin_request_url, _headers, HTTPClient.METHOD_POST, JSON.stringify(_login_request_body))
 
 
-# The token needs to be generated using an external service/function
 func login_with_custom_token(token : String) -> void:
 	if _is_ready():
 		is_busy = true
@@ -223,9 +212,6 @@ func login_with_custom_token(token : String) -> void:
 		auth_request_type = Auth_Type.LOGIN_CT
 		request(_base_url + _signin_custom_token_url, _headers, HTTPClient.METHOD_POST, JSON.stringify(_custom_token_body))
 
-# Open a web page in browser redirecting to Google oAuth2 page for the current project
-# Once given user's authorization, a token will be generated.
-# NOTE** with this method, the authorization process will be copy-pasted
 
 func get_google_auth(redirect_uri : String = "urn:ietf:wg:oauth:2.0:oob", client_id : String = Firebase._config.clientId) -> void:
 	var url_endpoint : String = _google_auth_request_url
@@ -240,7 +226,7 @@ func get_google_auth_manual() -> void:
 	url_endpoint = url_endpoint.replace("[CLIENT_ID]&", Firebase._config.clientId)
 	OS.shell_open(url_endpoint)
 
-# Exchange the authorization oAuth2 code obtained from browser with a proper access id_token
+
 func exchange_google_token(google_token : String, redirect_uri : String = "urn:ietf:wg:oauth:2.0:oob") -> void:
 	if _is_ready():
 		is_busy = true
@@ -265,27 +251,63 @@ func get_google_auth_redirect(redirect_uri : String, listen_to_port : int) -> vo
 	tcp_server.listen(listen_to_port, "::")
 
 
-# Open a web page in browser redirecting to Google oAuth2 page for the current project
-# Once given user's authorization, a token will be generated.
-# NOTE** the generated token will be automatically captured and a login request will be made if the token is correct
 func get_google_auth_localhost(port : int = 49152):
 	get_google_auth_redirect("http://localhost:%s/" % port, port)
 
 
+# ✅ FIX: raw HTTP GET request থেকে সঠিকভাবে auth code parse করা
 func _tcp_stream_timer() -> void:
 	var peer : StreamPeer = tcp_server.take_connection()
 	if peer != null:
-		var raw_result : String = peer.get_utf8_string(100)
+		# ❌ আগে ছিল: peer.get_utf8_string(100) — 100 bytes এ code কাটা যেত
+		# ✅ এখন: 4096 bytes নিচ্ছি যাতে পুরো code আসে
+		var raw_result : String = peer.get_utf8_string(4096)
+
+		# Browser কে success response পাঠাও — নাহলে browser error দেখায়
+		var http_response = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n"
+		http_response += "<html><body><h2>Login successful! You can close this tab.</h2></body></html>"
+		peer.put_data(http_response.to_utf8_buffer())
+
 		if raw_result != "" and raw_result.begins_with("GET"):
-			var token : String = raw_result.rsplit("=")[1].rstrip("&scope")
+			# Raw format: "GET /?code=4%2F0AX...abc&scope=email+openid HTTP/1.1"
+			# আমরা শুধু code=... অংশটা চাই
+
+			var code : String = ""
+
+			# URL থেকে query string বের করো
+			# GET /? এর পরে HTTP/1.1 এর আগে যা আছে সেটাই query string
+			var first_line = raw_result.split("\r\n")[0]  # শুধু প্রথম line নাও
+			# "GET /?code=XXX&scope=YYY HTTP/1.1"
+
+			if "code=" in first_line:
+				# "code=" এর পরের অংশ নাও
+				var after_code = first_line.split("code=")[1]
+				# "XXX&scope=YYY HTTP/1.1" — এখান থেকে & এর আগ পর্যন্ত নাও
+				if "&" in after_code:
+					code = after_code.split("&")[0]
+				elif " " in after_code:
+					# scope না থাকলে space এর আগ পর্যন্ত
+					code = after_code.split(" ")[0]
+				else:
+					code = after_code
+
+			if code == "":
+				Firebase._printerr("OAuth: Could not parse auth code from response")
+				tcp_server.stop()
+				peer.disconnect_from_host()
+				tcp_timer.stop()
+				remove_child(tcp_timer)
+				return
+
+			print("[Firebase Auth] OAuth code received, length: ", code.length())
+
 			tcp_server.stop()
 			peer.disconnect_from_host()
 			tcp_timer.stop()
 			remove_child(tcp_timer)
-			login_with_oauth(token, _google_auth_body.redirect_uri)
+			login_with_oauth(code, _google_auth_body.redirect_uri)
 
 
-# A token is automatically obtained using an authorization code using @get_google_auth()
 func login_with_oauth(_google_token: String, request_uri : String = "urn:ietf:wg:oauth:2.0:oob", provider_id : String = "google.com") -> void:
 	var google_token : String = _google_token.uri_decode()
 	_exchange_google_token(google_token, request_uri)
@@ -323,15 +345,10 @@ func manual_token_refresh(auth_data):
 	request(_refresh_request_base_url + _refresh_request_url, _headers, HTTPClient.METHOD_POST, JSON.stringify(_refresh_request_body))
 
 
-# This function is called whenever there is an authentication request to Firebase
-# On an error, this function with emit the signal 'login_failed' and print the error to the console
 func _on_FirebaseAuth_request_completed(result : int, response_code : int, headers : PackedStringArray, body : PackedByteArray) -> void:
 	is_busy = false
 	var res
 	if response_code == 0:
-		# Mocked error results to trigger the correct signal.
-		# Can occur if there is no internet connection, or the service is down,
-		# in which case there is no json_body (and thus parsing would fail).
 		res = {"error": {
 			"code": "Connection error",
 			"message": "Error connecting to auth service"}}
@@ -351,7 +368,6 @@ func _on_FirebaseAuth_request_completed(result : int, response_code : int, heade
 				Requests.EXCHANGE_TOKEN:
 					token_exchanged.emit(true)
 			begin_refresh_countdown()
-			# Refresh token countdown
 			auth_request.emit(1, auth)
 		else:
 			match res.kind:
@@ -368,7 +384,6 @@ func _on_FirebaseAuth_request_completed(result : int, response_code : int, heade
 					userdata_received.emit(userdata)
 			auth_request.emit(1, auth)
 	else:
-		# error message would be INVALID_EMAIL, EMAIL_NOT_FOUND, INVALID_PASSWORD, USER_DISABLED or WEAK_PASSWORD
 		if requesting == Requests.EXCHANGE_TOKEN:
 			token_exchanged.emit(false)
 			login_failed.emit(res.error, res.error_description)
@@ -383,8 +398,6 @@ func _on_FirebaseAuth_request_completed(result : int, response_code : int, heade
 	auth_request_type = Auth_Type.NONE
 
 
-
-# Function used to change the email account for the currently logged in user
 func change_user_email(email : String) -> void:
 	if _is_ready():
 		is_busy = true
@@ -393,7 +406,6 @@ func change_user_email(email : String) -> void:
 		request(_base_url + _update_account_request_url, _headers, HTTPClient.METHOD_POST, JSON.stringify(_change_email_body))
 
 
-# Function used to change the password for the currently logged in user
 func change_user_password(password : String) -> void:
 	if _is_ready():
 		is_busy = true
@@ -402,7 +414,6 @@ func change_user_password(password : String) -> void:
 		request(_base_url + _update_account_request_url, _headers, HTTPClient.METHOD_POST, JSON.stringify(_change_password_body))
 
 
-# User Profile handlers 
 func update_account(idToken : String, displayName : String, photoUrl : String, deleteAttribute : PackedStringArray, returnSecureToken : bool) -> void:
 	if _is_ready():
 		is_busy = true
@@ -414,7 +425,6 @@ func update_account(idToken : String, displayName : String, photoUrl : String, d
 		request(_base_url + _update_account_request_url, _headers, HTTPClient.METHOD_POST, JSON.stringify(_update_profile_body))
 
 
-# Function to send a account verification email
 func send_account_verification_email() -> void:
 	if _is_ready():
 		is_busy = true
@@ -422,8 +432,6 @@ func send_account_verification_email() -> void:
 		request(_base_url + _oobcode_request_url, _headers, HTTPClient.METHOD_POST, JSON.stringify(_account_verification_body))
 
 
-# Function used to reset the password for a user who has forgotten in.
-# This will send the users account an email with a password reset link
 func send_password_reset_email(email : String) -> void:
 	if _is_ready():
 		is_busy = true
@@ -431,7 +439,6 @@ func send_password_reset_email(email : String) -> void:
 		request(_base_url + _oobcode_request_url, _headers, HTTPClient.METHOD_POST, JSON.stringify(_password_reset_body))
 
 
-# Function called to get all
 func get_user_data() -> void:
 	if _is_ready():
 		is_busy = true
@@ -439,18 +446,15 @@ func get_user_data() -> void:
 			print_debug("Not logged in")
 			is_busy = false
 			return
-						
 		request(_base_url + _userdata_request_url, _headers, HTTPClient.METHOD_POST, JSON.stringify({"idToken":auth.idtoken}))
 
 
-# Function used to delete the account of the currently authenticated user
 func delete_user_account() -> void:
 	if _is_ready():
 		is_busy = true
 		request(_base_url + _delete_account_request_url, _headers, HTTPClient.METHOD_POST, JSON.stringify({"idToken":auth.idtoken}))
 
 
-# Function is called when a new token is issued to a user. The function will yield until the token has expired, and then request a new one.
 func begin_refresh_countdown() -> void:
 	var refresh_token = null
 	var expires_in = 1000
@@ -470,8 +474,6 @@ func begin_refresh_countdown() -> void:
 	request(_refresh_request_base_url + _refresh_request_url, _headers, HTTPClient.METHOD_POST, JSON.stringify(_refresh_request_body))
 
 
-# This function is used to make all keys lowercase
-# This is only used to cut down on processing errors from Firebase
 func get_clean_keys(auth_result : Dictionary) -> Dictionary:
 	var cleaned : Dictionary
 	for key in auth_result.keys():
