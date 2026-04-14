@@ -18,8 +18,8 @@ var _config := {
 	"messagingSenderId" : "1037544242630",
 	"appId" : "1:1037544242630:web:07cfcadf47cc8f0ee786c7",
 	"measurementId" : "G-3459FRP6RH",
-	"clientId" : "",        # firebase_secrets.gd থেকে load হবে
-	"clientSecret" : "",    # firebase_secrets.gd থেকে load হবে
+	"clientId" : "",
+	"clientSecret" : "",
 	"domainUriPrefix" : "",
 	"functionsGeoZone" : "",
 }
@@ -30,10 +30,14 @@ func _ready() -> void:
 
 
 func _load_secrets() -> void:
-	if Engine.has_singleton("FirebaseSecrets"):
-		var secrets = Engine.get_singleton("FirebaseSecrets")
-		_config["clientId"] = secrets.CLIENT_ID
-		_config["clientSecret"] = secrets.CLIENT_SECRET
+	# secrets.cfg file থেকে load করো (gitignore এ আছে)
+	var cfg = ConfigFile.new()
+	var err = cfg.load("res://secrets.cfg")
+	if err == OK:
+		_config["clientId"] = cfg.get_value("firebase", "clientId", "")
+		_config["clientSecret"] = cfg.get_value("firebase", "clientSecret", "")
+	else:
+		printerr("[Firebase] secrets.cfg not found! Google login will not work.")
 
 
 func setup_modules(config : Dictionary) -> void:

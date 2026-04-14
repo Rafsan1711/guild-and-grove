@@ -18,7 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameState="*uid://djep6874kuowi"
-FirebaseSecrets="*uid://ijyts4hioqxs"
+FirebaseSecrets="uid://ijyts4hioqxs"
 Firebase="*uid://crkd8dxfj14l7"
 
 [editor_plugins]

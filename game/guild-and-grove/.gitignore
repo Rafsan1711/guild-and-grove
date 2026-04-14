@@ -1,4 +1,5 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
-firebase_secrets.gd
+secrets.cfg
+autoloads/firebase_secrets.gd
