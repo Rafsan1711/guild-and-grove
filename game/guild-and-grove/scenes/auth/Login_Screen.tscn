@@ -2,25 +2,64 @@
 
 [ext_resource type="Script" uid="uid://27mgbhgvtkoc" path="res://scripts/auth/login_screen.gd" id="1_ac1fg"]
 
+[sub_resource type="VideoStreamTheora" id="VideoStreamTheora_ac1fg"]
+file = "res://assets/sprites/login_bg.ogv"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m2p07"]
+bg_color = Color(0.050980393, 0.105882354, 0.16470589, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.95686275, 0.63529414, 0.38039216, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tp2ey"]
+bg_color = Color(0.95686275, 0.63529414, 0.38039216, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xydya"]
+bg_color = Color(0.90588236, 0.43529412, 0.31764707, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
 [node name="LoginScreen" type="Control" unique_id=499728126]
 layout_mode = 3
-anchors_preset = 0
-offset_left = 434.0
-offset_top = 188.0
-offset_right = 474.0
-offset_bottom = 228.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_ac1fg")
 
-[node name="ColorRect" type="ColorRect" parent="." unique_id=987282763]
+[node name="VideoPlayer" type="VideoStreamPlayer" parent="." unique_id=2013169721]
+layout_mode = 0
+pivot_offset = Vector2(-50, -50)
+pivot_offset_ratio = Vector2(-50, -50)
+stream = SubResource("VideoStreamTheora_ac1fg")
+autoplay = true
+expand = true
+loop = true
+
+[node name="DarkOverlay" type="ColorRect" parent="." unique_id=1126841404]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.101960786, 0.18039216, 0.101960786, 1)
+color = Color(0.050980393, 0.105882354, 0.16470589, 0.47058824)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2060047428]
+[node name="CenterPanel" type="PanelContainer" parent="." unique_id=951185242]
+custom_minimum_size = Vector2(420, 320)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -28,30 +67,48 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -20.0
-offset_top = -31.0
+offset_top = -46.5
 offset_right = 20.0
-offset_bottom = 31.0
+offset_bottom = 46.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 20
+pivot_offset = Vector2(200, 0)
+theme_override_styles/panel = SubResource("StyleBoxFlat_m2p07")
 
-[node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=265290133]
+[node name="VBox" type="VBoxContainer" parent="CenterPanel" unique_id=432261909]
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Title" type="Label" parent="CenterPanel/VBox" unique_id=2019066854]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95686275, 0.63529414, 0.38039216, 1)
+theme_override_font_sizes/font_size = 52
 text = "Guild & Grove"
 horizontal_alignment = 1
 
-[node name="SubtitleLabel" type="Label" parent="VBoxContainer" unique_id=929514315]
+[node name="Subtitle" type="Label" parent="CenterPanel/VBox" unique_id=2056029083]
 layout_mode = 2
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.9137255, 0.9254902, 0.9372549, 1)
 text = "An Online Village Adventure"
+horizontal_alignment = 1
 
-[node name="GoogleBtn" type="Button" parent="VBoxContainer" unique_id=43593192]
-custom_minimum_size = Vector2(300, 60)
+[node name="Spacer" type="Control" parent="CenterPanel/VBox" unique_id=254442801]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
-text = "🌐  Sign in with Google"
 
-[node name="StatusLabel" type="Label" parent="." unique_id=1565825042]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
+[node name="GoogleBtn" type="Button" parent="CenterPanel/VBox" unique_id=1560303048]
+custom_minimum_size = Vector2(320, 56)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.050980393, 0.105882354, 0.16470589, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_tp2ey")
+theme_override_styles/hover = SubResource("StyleBoxFlat_xydya")
+text = " 🌐   Sign in with Google"
+
+[node name="StatusLabel" type="Label" parent="CenterPanel/VBox" unique_id=684660905]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6784314, 0.70980394, 0.7411765, 1)
+theme_override_font_sizes/font_size = 13
+text = "Sign in to play Guild & Grove"
+horizontal_alignment = 1
