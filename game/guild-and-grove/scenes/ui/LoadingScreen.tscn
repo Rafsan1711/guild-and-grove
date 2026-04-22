@@ -1,0 +1,93 @@
+[gd_scene format=3 uid="uid://bemiwb2id6q8p"]
+
+[ext_resource type="Texture2D" uid="uid://l10su26bcvj0" path="res://assets/sprites/ui/loading_bg.png" id="1_6reco"]
+[ext_resource type="Script" uid="uid://b4awxvna4a43s" path="res://scripts/ui/loading_screen.gd" id="1_8gcry"]
+[ext_resource type="Texture2D" uid="uid://87cq8utqvsgn" path="res://assets/sprites/ui/logo.png" id="2_8gcry"]
+
+[node name="LoadingScreen" type="CanvasLayer" unique_id=768589271]
+script = ExtResource("1_8gcry")
+
+[node name="Control" type="Control" parent="." unique_id=1343691012]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BackgroundRect" type="TextureRect" parent="Control" unique_id=1641719949]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_6reco")
+expand_mode = 1
+
+[node name="DarkOverlay" type="ColorRect" parent="Control" unique_id=1644975366]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.07, 0.05, 0.6)
+
+[node name="LogoTexture" type="TextureRect" parent="Control" unique_id=108644299]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_8gcry")
+expand_mode = 3
+
+[node name="GameTitle" type="Label" parent="Control" unique_id=1871744857]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0.95686275, 0.64705884, 0.22745098, 1)
+theme_override_font_sizes/font_size = 42
+text = "Guild & Grove"
+horizontal_alignment = 1
+
+[node name="LoadingBarBG" type="ColorRect" parent="Control" unique_id=1669688173]
+custom_minimum_size = Vector2(700, 22)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0.08, 0.12, 0.08, 0.9)
+
+[node name="LoadingBarFill" type="ColorRect" parent="Control/LoadingBarBG" unique_id=1917235673]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 2.0
+offset_bottom = 20.0
+color = Color(0.95686275, 0.64705884, 0.22745098, 1)
+
+[node name="PercentLabel" type="Label" parent="Control" unique_id=120039777]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0.91764706, 0.9098039, 0.8352941, 1)
+theme_override_font_sizes/font_size = 18
+text = "0%"
+horizontal_alignment = 1
+
+[node name="LoadingLabel" type="Label" parent="Control" unique_id=158118815]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0.60784316, 0.65882355, 0.627451, 1)
+theme_override_font_sizes/font_size = 16
+text = "Loading..."
+horizontal_alignment = 1
+
+[node name="TipLabel" type="Label" parent="Control" unique_id=1231652620]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0.60784316, 0.65882355, 0.627451, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1

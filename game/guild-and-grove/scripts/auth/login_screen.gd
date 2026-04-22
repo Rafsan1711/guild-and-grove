@@ -84,22 +84,23 @@ func _on_google_login_pressed():
 
 
 func _on_login_success(auth_info: Dictionary):
-	status_label.text = "✅ Logged in successfully!"
-	
+	status_label.text = "✅ Login successful! Loading..."
+	google_btn.disabled = true
+
 	GameState.player_uid = auth_info.get("localid", "")
 	GameState.player_email = auth_info.get("email", "")
-	GameState.player_display_name = auth_info.get("displayname", "Player")
+	GameState.player_display_name = auth_info.get("displayname", "Traveler")
 	GameState.player_photo_url = auth_info.get("photouri", "")
 	GameState.is_logged_in = true
-	
-	print("✅ Login success! UID: ", GameState.player_uid)
-	print("   Name: ", GameState.player_display_name)
-	
+
+	print("Login OK — UID: ", GameState.player_uid)
+
 	var tween = create_tween().set_parallel(true)
-	tween.tween_property($DarkOverlay, "color:a", 1.0, 1.0)
-	tween.tween_property($CenterPanel, "modulate:a", 0.0, 0.8)
-	await get_tree().create_timer(1.2).timeout
-	# get_tree().change_scene_to_file("res://scenes/world/MainWorld.tscn")
+	tween.tween_property($DarkOverlay, "color:a", 1.0, 0.8)
+	tween.tween_property($CenterPanel, "modulate:a", 0.0, 0.6)
+	await get_tree().create_timer(0.9).timeout
+
+	SceneManager.go_to("res://scenes/ui/HomeScreen.tscn", true, 1.5)
 
 
 func _on_login_failed(code, message):
@@ -113,3 +114,4 @@ func _on_login_failed(code, message):
 		tween.tween_property($CenterPanel, "position:x", original_x + 10, 0.05)
 		tween.tween_property($CenterPanel, "position:x", original_x - 10, 0.05)
 	tween.tween_property($CenterPanel, "position:x", original_x, 0.05)
+	

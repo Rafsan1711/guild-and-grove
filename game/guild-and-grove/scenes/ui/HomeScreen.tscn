@@ -1,0 +1,98 @@
+[gd_scene format=3 uid="uid://qyruemwj8jeo"]
+
+[ext_resource type="VideoStream" uid="uid://bv3k54td4fx6s" path="res://assets/sprites/ui/home_bg.ogv" id="1_flaim"]
+[ext_resource type="Texture2D" uid="uid://87cq8utqvsgn" path="res://assets/sprites/ui/logo.png" id="2_pcfyh"]
+
+[node name="Control" type="Control" unique_id=1563476536]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VideoPlayer" type="VideoStreamPlayer" parent="." unique_id=637328561]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stream = ExtResource("1_flaim")
+autoplay = true
+expand = true
+loop = true
+
+[node name="DarkOverlay" type="ColorRect" parent="." unique_id=1942367637]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.07, 0.04, 0.55)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1996728992]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1004979741]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="LogoTexture" type="TextureRect" parent="CenterContainer/VBoxContainer" unique_id=1187825227]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+texture = ExtResource("2_pcfyh")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=90465228]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95686275, 0.64705884, 0.22745098, 1)
+theme_override_font_sizes/font_size = 54
+text = "Guild & Grove"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1060426621]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91764706, 0.9098039, 0.8352941, 1)
+theme_override_font_sizes/font_size = 18
+text = "An Online Village Adventure"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer" unique_id=965509573]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="PlayBtn" type="Button" parent="CenterContainer/VBoxContainer" unique_id=907017485]
+custom_minimum_size = Vector2(320, 58)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "▶   PLAY"
+
+[node name="SettingsBtn" type="Button" parent="CenterContainer/VBoxContainer" unique_id=981355708]
+custom_minimum_size = Vector2(320, 58)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "⚙   SETTINGS"
+
+[node name="CreditsBtn" type="Button" parent="CenterContainer/VBoxContainer" unique_id=383126524]
+custom_minimum_size = Vector2(320, 58)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "ℹ   CREDITS"
+
+[node name="VersionLabel" type="Label" parent="." unique_id=246711570]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0.60784316, 0.65882355, 0.627451, 1)
+theme_override_font_sizes/font_size = 12
+text = "v0.1.0 Alpha  ·  © 2025 Guild & Grove
+"

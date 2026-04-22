@@ -20,6 +20,8 @@ config/icon="res://icon.svg"
 GameState="*uid://djep6874kuowi"
 FirebaseSecrets="uid://ijyts4hioqxs"
 Firebase="*uid://crkd8dxfj14l7"
+SceneManager="*uid://ish3dmijee1b"
+AudioManager="*uid://ci4jlhkrfgavy"
 
 [editor_plugins]
 
@@ -31,5 +33,6 @@ enabled=PackedStringArray("res://addons/FirebaseAPI/plugin.cfg")
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
