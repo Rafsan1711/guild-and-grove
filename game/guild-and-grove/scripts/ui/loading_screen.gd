@@ -29,34 +29,47 @@ var _target_scene: String = ""
 var _is_loading: bool = false
 
 func _ready() -> void:
+	# FIX Bug 3: _ready() তে সরাসরি size set করলে layout system override করে।
+	# একটা frame অপেক্ষা করে তারপর center করতে হবে।
+	await get_tree().process_frame
 	_center_elements()
+
 	tip_label.text = "💡  " + TIPS[randi() % TIPS.size()]
 	bar_fill.size.x = 0.0
 	percent_label.text = "0%"
 	logo_texture.modulate.a = 0.0
 	game_title.modulate.a = 0.0
+
 	var tween = create_tween().set_parallel(true)
 	tween.tween_property(logo_texture, "modulate:a", 1.0, 0.8)
 	tween.tween_property(game_title, "modulate:a", 1.0, 1.0)
-	# ← এই দুই line _ready() এর ভেতরে, শেষে
+
+	# আরেকটা frame দিয়ে loading শুরু করো
 	await get_tree().process_frame
 	start_fake_loading("res://scenes/auth/Login_Screen.tscn", 2.5)
-	
 
 func _center_elements() -> void:
 	var vp = get_viewport().get_visible_rect().size
-	control.size = vp
-	control.position = Vector2.ZERO
+
+	# FIX Bug 3: size set করার সঠিক পদ্ধতি।
+	# Control এর anchor Full Rect থাকলে size manually set না করলেও চলে।
+	# কিন্তু position গুলো set করা যায়।
+	control.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
 	logo_texture.position = Vector2((vp.x - 200.0) / 2.0, vp.y * 0.22)
 	game_title.position = Vector2(0.0, logo_texture.position.y + 215.0)
 	game_title.size = Vector2(vp.x, 50.0)
+
 	var bar_y = vp.y * 0.78
 	bar_bg.position = Vector2((vp.x - 700.0) / 2.0, bar_y)
 	bar_bg.size = Vector2(700.0, 22.0)
+
 	percent_label.position = Vector2(0.0, bar_y + 28.0)
 	percent_label.size = Vector2(vp.x, 30.0)
+
 	loading_label.position = Vector2(0.0, bar_y + 60.0)
 	loading_label.size = Vector2(vp.x, 28.0)
+
 	tip_label.position = Vector2(vp.x * 0.1, bar_y + 92.0)
 	tip_label.size = Vector2(vp.x * 0.8, 30.0)
 

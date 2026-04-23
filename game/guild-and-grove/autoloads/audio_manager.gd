@@ -25,14 +25,16 @@ func play_music(path: String, fade_in: float = 1.0) -> void:
 		push_error("AudioManager: Cannot load " + path)
 		return
 	if _music_player.playing:
-		var t = create_tween()
-		t.tween_property(_music_player, "volume_db", -80.0, 0.5)
-		await t.finished
+		# FIX: renamed to tween_out to avoid duplicate 'var t' in same scope
+		var tween_out = create_tween()
+		tween_out.tween_property(_music_player, "volume_db", -80.0, 0.5)
+		await tween_out.finished
 	_music_player.stream = stream
 	_music_player.volume_db = -80.0
 	_music_player.play()
-	var t = create_tween()
-	t.tween_property(_music_player, "volume_db", music_volume_db, fade_in)
+	# FIX: renamed to tween_in — no longer conflicts
+	var tween_in = create_tween()
+	tween_in.tween_property(_music_player, "volume_db", music_volume_db, fade_in)
 
 func stop_music(fade_out: float = 1.0) -> void:
 	if not _music_player.playing:

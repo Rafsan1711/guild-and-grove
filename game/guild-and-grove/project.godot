@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="GuildAndGrove"
-run/main_scene="uid://cdp1ffd3dlah1"
+run/main_scene="uid://bemiwb2id6q8p"
 config/features=PackedStringArray("4.6", "Mobile")
 config/icon="res://icon.svg"
 
